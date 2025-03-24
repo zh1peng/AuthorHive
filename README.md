@@ -17,7 +17,7 @@ You can install the development version directly from GitHub:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("yourusername/AuthorHive")
+devtools::install_github("zh1peng/AuthorHive")
 ```
 
 ## 📖 Quick Start
@@ -74,5 +74,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📧 Contact
 
-- Your Name - your_email@example.com
-- Project Link: [https://github.com/yourusername/AuthorHive](https://github.com/yourusername/AuthorHive)
+- Your Name -zhipeng30@foxmail.com
+- Project Link: [https://github.com/zh1peng/AuthorHive](https://github.com/zh1peng/AuthorHive)
