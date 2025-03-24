@@ -15,3 +15,8 @@ devtools::document()
 # styler::style_pkg()
 devtools::build()
 devtools::install()
+
+usethis::use_github()
+usethis::use_agpl3_license()
+
+usethis::use_package("shiny")
