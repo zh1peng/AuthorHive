@@ -1,6 +1,6 @@
 install.packages(c("usethis", "devtools", "roxygen2"))
 
-usethis::create_package("AuthorHive")
+usethis::create_package("authordown")
 
 usethis::use_git()
 

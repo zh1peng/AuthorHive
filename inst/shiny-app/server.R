@@ -1,5 +1,5 @@
 library(shiny)
-library(AuthorHive)
+library(authordown)
 
 server <- function(input, output){
   

@@ -1,7 +1,7 @@
 
-# 🐝 AuthorHive
+# 🐝 authordown
 
-**AuthorHive** is an easy-to-use R package designed to streamline the management of author metadata, affiliations, and contributions in academic manuscripts—particularly helpful for papers with extensive author lists.
+**authordown** is an easy-to-use R package designed to streamline the management of author metadata, affiliations, and contributions in academic manuscripts—particularly helpful for papers with extensive author lists.
 
 ## ✨ Features
 
@@ -17,7 +17,7 @@ You can install the development version directly from GitHub:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("zh1peng/AuthorHive")
+devtools::install_github("zh1peng/authordown")
 ```
 
 ## 📖 Quick Start
@@ -25,7 +25,7 @@ devtools::install_github("zh1peng/AuthorHive")
 Prepare your author data using the provided CSV template (`author_template.csv`):
 
 ```r
-library(AuthorHive)
+library(authordown)
 
 # Load author data
 authors <- read.csv("author_template.csv")
@@ -41,7 +41,7 @@ A convenient Shiny interface is included:
 ```r
 library(shiny)
 
-shiny::runApp(system.file("shiny-app", package = "AuthorHive"))
+shiny::runApp(system.file("shiny-app", package = "authordown"))
 ```
 
 Simply upload your CSV file, select journal style, and get your formatted content instantly.
@@ -75,4 +75,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## 📧 Contact
 
 - Your Name -zhipeng30@foxmail.com
-- Project Link: [https://github.com/zh1peng/AuthorHive](https://github.com/zh1peng/AuthorHive)
+- Project Link: [https://github.com/zh1peng/authordown](https://github.com/zh1peng/authordown)
