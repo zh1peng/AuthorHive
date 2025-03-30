@@ -4,24 +4,24 @@
 \alias{generate_acknowledgement}
 \title{Generate an Acknowledgement Section}
 \usage{
-generate_acknowledgement(data, style = c("paragraph", "bullets"))
+generate_acknowledgement(data)
 }
 \arguments{
-\item{data}{A data frame containing a column \code{Acknowledgement}.}
-
-\item{style}{A character string to control the format (\"paragraph\" or \"bullets\").}
+\item{data}{A data frame containing at least the columns: FirstName, LastName, and Acknowledgement.}
 }
 \value{
-A character string representing the combined acknowledgements.
+A character string with the formatted acknowledgements.
 }
 \description{
-Reads each author's Acknowledgement text (if any) and merges
-them into a single paragraph or bullet list.
+Combines acknowledgements from each author into a formatted paragraph.
+Each line indicates the author and their acknowledgement.
 }
 \examples{
 authors <- data.frame(
   FirstName = c("Alice", "Bob"),
-  Acknowledgement = c("Thanks to funder A", "")
+  LastName = c("Smith", "Johnson"),
+  Acknowledgement = c("Thanks for funding A", "Supported by XYZ"),
+  stringsAsFactors = FALSE
 )
 generate_acknowledgement(authors)
 }

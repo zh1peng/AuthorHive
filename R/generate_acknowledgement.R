@@ -1,16 +1,18 @@
-#' Generate an Acknowledgement Section
+#' Generate an Acknowledgement Section (Updated)
 #'
-#' @description Combines acknowledgements from each author into a formatted paragraph.
-#' Each line indicates the author and their acknowledgement.
+#' @description Combines acknowledgements provided by the authors into a single,
+#' coherent sentence. The function ignores author names (as they are assumed to be
+#' included in the acknowledgement text itself) and simply concatenates each non-empty
+#' acknowledgement entry using a semicolon.
 #'
-#' @param data A data frame containing at least the columns: FirstName, LastName, and Acknowledgement.
-#' @return A character string with the formatted acknowledgements.
+#' @param data A data frame containing at least the column Acknowledgement.
+#' @return A character string with the combined acknowledgements.
 #' @export
 #' @examples
 #' authors <- data.frame(
-#'   FirstName = c("Alice", "Bob"),
-#'   LastName = c("Smith", "Johnson"),
-#'   Acknowledgement = c("Thanks for funding A", "Supported by XYZ"),
+#'   Acknowledgement = c("This work received support from resource X", 
+#'                       "Resource Y was instrumental", 
+#'                       "Alice Smith received support from resource ZZ"),
 #'   stringsAsFactors = FALSE
 #' )
 #' generate_acknowledgement(authors)
@@ -19,14 +21,13 @@ generate_acknowledgement <- function(data) {
     return("No acknowledgement information provided.")
   }
   
-  valid <- data[!is.na(data$Acknowledgement) & data$Acknowledgement != "", ]
-  if (nrow(valid) == 0) {
+  valid <- data$Acknowledgement[!is.na(data$Acknowledgement) & data$Acknowledgement != ""]
+  if (length(valid) == 0) {
     return("No acknowledgements provided.")
   }
   
-  lines <- apply(valid, 1, function(row) {
-    paste0(row["FirstName"], " ", row["LastName"], " acknowledges: ", row["Acknowledgement"])
-  })
-  result <- paste(lines, collapse = "\n")
+  # Concatenate all provided acknowledgement sentences
+  result <- paste(valid, collapse = "; ")
+  result <- paste("Acknowledgements:", result)
   return(result)
 }

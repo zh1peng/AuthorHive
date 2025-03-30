@@ -2,27 +2,26 @@
 % Please edit documentation in R/generate_contribution.R
 \name{generate_contribution}
 \alias{generate_contribution}
-\title{Generate Author Contributions (CRediT)}
+\title{Generate Author Contributions}
 \usage{
-generate_contribution(data, list_style = TRUE)
+generate_contribution(data)
 }
 \arguments{
-\item{data}{A data frame containing a column \code{Contribution}.}
-
-\item{list_style}{If TRUE, each author’s contribution is on a new line.}
+\item{data}{A data frame containing at least the columns: FirstName, LastName, and Contribution.}
 }
 \value{
-A character string summarizing contributions.
+A character string summarizing the author contributions.
 }
 \description{
-Merges each author's contribution statement into a single block.
-Optionally includes the author's name in front for clarity.
+Combines each author's contribution statement into a clear paragraph.
+Each line indicates the author and their specific contribution.
 }
 \examples{
 authors <- data.frame(
   FirstName = c("Alice", "Bob"),
   LastName = c("Smith", "Johnson"),
-  Contribution = c("Conceptualization; Data curation", "Supervision; Writing - review")
+  Contribution = c("Conceptualization; Data curation", "Supervision; Writing - review"),
+  stringsAsFactors = FALSE
 )
 generate_contribution(authors)
 }

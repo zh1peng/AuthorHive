@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_title_page.R
 \name{generate_title_page}
 \alias{generate_title_page}
-\title{Generate a formatted title page}
+\title{Generate a Title Page}
 \usage{
 generate_title_page(
   data,
@@ -12,26 +12,22 @@ generate_title_page(
 )
 }
 \arguments{
-\item{data}{A data frame with at least these columns:
-\code{FirstName}, \code{LastName}, \code{Rank}, \code{Correspondence},
-and one or more \code{AffiliationX} columns.}
+\item{data}{A data frame containing at least: FirstName, MiddleName, LastName,
+(optionally) Rank, Correspondence, and one or more Affiliation* columns.}
 
-\item{style}{A character string indicating the style (e.g., \"default\",
-\"APA\", \"Nature\"). Different styles can alter the formatting, order,
-or punctuation.}
+\item{style}{A character string specifying the style (e.g., "default", "APA", "Nature").}
 
-\item{title}{Optional paper title to include at the top. If NULL, omitted.}
+\item{title}{An optional paper title.}
 
-\item{co_first_footnote}{Logical. If TRUE, automatically detects authors
-with the same top \code{Rank} and marks them as co-first authors.}
+\item{co_first_footnote}{Logical. If TRUE and Rank is provided, adds a note for co-first authors.}
 }
 \value{
-A character string representing the entire title page.
+A character string with the formatted title page.
 }
 \description{
-Creates a title page string (ready to copy/paste into Word)
-using the provided author data. It handles multiple affiliations,
-co-first authors, and corresponding authors.
+Produces a formatted title page that includes the paper title,
+author names with affiliation indices, and an affiliation legend. Optionally adds
+a note for co-first authors.
 }
 \examples{
 authors <- data.frame(
@@ -40,10 +36,11 @@ authors <- data.frame(
   LastName = c("Smith", "Johnson"),
   Degree = c("PhD", "MD"),
   Email = c("alice@example.com", "bob@example.com"),
-  Rank = c(1, 1),  # co-first authors
+  Rank = c(1, 2),
   Correspondence = c(TRUE, FALSE),
   Affiliation1 = c("University of X, Dept. of Y", "University of X, Dept. of Y"),
-  Affiliation2 = c(NA, "Company Z, Research Division")
+  Affiliation2 = c(NA, "Company Z, Research Division"),
+  stringsAsFactors = FALSE
 )
 generate_title_page(authors, style = "default", title = "Example Paper")
 }

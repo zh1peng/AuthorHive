@@ -7,21 +7,22 @@
 generate_conflict(data)
 }
 \arguments{
-\item{data}{A data frame containing a column \code{Conflict}.}
+\item{data}{A data frame containing at least the columns: FirstName, LastName, and Conflict.}
 }
 \value{
-A character string for the conflict of interest statement.
+A character string with the formatted conflict statement.
 }
 \description{
-Reads each author's Conflict text (if any) and merges them
-into a single statement. If all authors say \"No conflict\", returns a
-single line: \"All authors declare no conflict of interest.\"
+Produces a readable conflict statement. If all authors report no conflict,
+it states so. Otherwise, it lists the authors reporting conflicts and then indicates that
+the remaining authors declare no conflict.
 }
 \examples{
 authors <- data.frame(
   FirstName = c("Alice", "Bob"),
   LastName = c("Smith", "Johnson"),
-  Conflict = c("No conflict", "Consultant at Company Z")
+  Conflict = c("No conflict", "Consultant at Company Z"),
+  stringsAsFactors = FALSE
 )
 generate_conflict(authors)
 }

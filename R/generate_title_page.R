@@ -1,92 +1,198 @@
-#' Generate a Title Page
+#' Generate a Title Page (Journal-Style)
 #'
-#' @description Produces a formatted title page that includes the paper title,
-#' author names with affiliation indices, and an affiliation legend. Optionally adds
-#' a note for co-first authors.
+#' @description Produces a journal-style title page text with:
+#'   \enumerate{
+#'     \item An optional paper title
+#'     \item Author line (with superscript affiliation indices)
+#'     \item Affiliation list (labeled by superscript numbers)
+#'     \item Co-first author footnote (\\code{\\u2020} or \"†\") if multiple authors share the same minimal rank
+#'     \item Corresponding author footnote (*) and contact line
+#'   }
 #'
-#' @param data A data frame containing at least: FirstName, MiddleName, LastName,
-#' (optionally) Rank, Correspondence, and one or more Affiliation* columns.
-#' @param style A character string specifying the style (e.g., "default", "APA", "Nature").
-#' @param title An optional paper title.
-#' @param co_first_footnote Logical. If TRUE and Rank is provided, adds a note for co-first authors.
-#' @return A character string with the formatted title page.
+#' The function expects columns:
+#'   \\itemize{
+#'     \\item \\strong{FirstName}, \\strong{MiddleName}, \\strong{LastName} (strings)
+#'     \\item \\strong{Rank} (numeric), used to detect co-first authors (lowest rank)
+#'     \\item \\strong{Correspondence} (logical or \"TRUE\"/\"FALSE\" string)
+#'     \\item \\strong{Email} (for corresponding authors)
+#'     \\item \\strong{Affiliation1}, \\strong{Affiliation2}, etc. (any number of these)
+#'   }
+#'
+#' @param data A data frame with the columns listed above.
+#' @param title Optional character string for the paper title.
+#' @param co_first_footnote Logical. If \\code{TRUE}, adds a footnote for co-first authors if multiple authors share the same \\strong{lowest} rank.
+#' @return A single character string suitable for copy-pasting into Word.
 #' @export
 #' @examples
 #' authors <- data.frame(
-#'   FirstName = c("Alice", "Bob"),
-#'   MiddleName = c("M.", ""),
-#'   LastName = c("Smith", "Johnson"),
-#'   Degree = c("PhD", "MD"),
-#'   Email = c("alice@example.com", "bob@example.com"),
-#'   Rank = c(1, 2),
-#'   Correspondence = c(TRUE, FALSE),
-#'   Affiliation1 = c("University of X, Dept. of Y", "University of X, Dept. of Y"),
-#'   Affiliation2 = c(NA, "Company Z, Research Division"),
+#'   FirstName      = c("Alice", "Bob", "Charlie"),
+#'   MiddleName     = c("M.", "", "Q."),
+#'   LastName       = c("Smith", "Johnson", "Lee"),
+#'   Degree         = c("PhD", "MD", "PhD"),
+#'   Email          = c("alice@example.com", "bob@example.com", "charlie@example.org"),
+#'   Rank           = c(1, 1, 2),  # Alice and Bob are co-first authors
+#'   Correspondence = c(TRUE, FALSE, FALSE),
+#'   Affiliation1   = c("University of X, Dept. of Y", "University of X, Dept. of Y", "Institute of Z"),
+#'   Affiliation2   = c(NA, "Company W", NA),
 #'   stringsAsFactors = FALSE
 #' )
-#' generate_title_page(authors, style = "default", title = "Example Paper")
-generate_title_page <- function(data, style = c("default", "APA", "Nature"),
-                                title = NULL, co_first_footnote = TRUE) {
-  style <- match.arg(style)
-  
-  # Sort authors by Rank if available
-  if ("Rank" %in% names(data)) {
-    data <- data[order(data$Rank), ]
+#' cat(generate_title_page(authors, title = "A Great Paper"))
+generate_title_page <- function(data, title = NULL, co_first_footnote = TRUE) {
+  # 1) Sort authors by Rank if present
+  if ("Rank" %in% colnames(data)) {
+    data <- data[order(data$Rank, na.last = TRUE), ]
   }
   
-  # Identify affiliation columns (names starting with "Affiliation")
-  aff_cols <- grep("^Affiliation", names(data), value = TRUE)
-  all_affils <- unique(unlist(lapply(data[, aff_cols, drop = FALSE], function(x) {
-    x <- as.character(x)
-    x[x != "" & !is.na(x)]
-  })))
-  
-  # Create mapping for affiliations
-  affil_indices <- seq_along(all_affils)
-  
-  # Function to get indices for an author's affiliations
-  get_aff_indices <- function(row) {
-    affs <- as.character(unlist(row[aff_cols]))
-    affs <- affs[affs != "" & !is.na(affs)]
-    if(length(affs) == 0) return("")
-    indices <- sapply(affs, function(x) which(all_affils == x))
-    paste0(indices, collapse = ",")
-  }
-  
-  # Build author lines with name and affiliation indices
-  author_lines <- apply(data, 1, function(row) {
-    name <- paste(row["FirstName"], row["MiddleName"], row["LastName"])
-    name <- gsub("  ", " ", name)  # remove extra spaces if MiddleName is missing
-    aff_index <- get_aff_indices(row)
-    corr_symbol <- ""
-    if ("Correspondence" %in% names(data)) {
-      corr_val <- tolower(as.character(row["Correspondence"]))
-      if (corr_val %in% c("true", "yes", "1")) {
-        corr_symbol <- "*"
+  # 2) Identify co-first authors if multiple authors share the same minimal rank
+  co_first_flag <- FALSE
+  co_first_rank <- NULL
+  if (co_first_footnote && "Rank" %in% colnames(data)) {
+    if (!all(is.na(data$Rank))) {
+      min_rank <- min(data$Rank, na.rm = TRUE)
+      # Count how many authors have this rank
+      if (sum(data$Rank == min_rank, na.rm = TRUE) > 1) {
+        co_first_flag <- TRUE
+        co_first_rank <- min_rank
       }
     }
-    paste0(name, corr_symbol, " [", aff_index, "]")
+  }
+  
+  # 3) Identify corresponding authors
+  #    Accept "TRUE"/"FALSE" strings or logical
+  if ("Correspondence" %in% colnames(data)) {
+    is_corr <- function(x) {
+      if (is.logical(x)) return(x)
+      # If it's a string, check if it's "true", "TRUE", "yes", "1"
+      tolower(trimws(x)) %in% c("true", "yes", "1")
+    }
+    data$IsCorresponding <- sapply(data$Correspondence, is_corr)
+  } else {
+    data$IsCorresponding <- FALSE
+  }
+  
+  # 4) Gather all affiliation columns
+  aff_cols <- grep("^Affiliation", names(data), value = TRUE)
+  # Extract unique non-NA affiliations in the order they appear
+  all_affils <- character()
+  for (col in aff_cols) {
+    vals <- as.character(data[[col]])
+    vals <- vals[!is.na(vals) & vals != ""]
+    for (v in vals) {
+      if (!(v %in% all_affils)) {
+        all_affils <- c(all_affils, v)
+      }
+    }
+  }
+  # Indices for the unique affiliations
+  aff_indices <- seq_along(all_affils)
+  
+  # 5) Build the author line
+  #    e.g., "Alice M. Smith^1†*, Bob Johnson^1,2†, Charlie Q. Lee^3"
+  author_strs <- apply(data, 1, function(row) {
+    # Name
+    nm_parts <- c(row["FirstName"], row["MiddleName"], row["LastName"], row["Degree"])
+    nm_parts <- nm_parts[!is.na(nm_parts) & nm_parts != "" & nm_parts != "NA"]
+    full_name <- paste(nm_parts, collapse = " ")
+    
+    # Affiliations for this author
+    aff_for_author <- c()
+    for (col in aff_cols) {
+      val <- row[col]
+      if (!is.na(val) && val != "") {
+        # find index in all_affils
+        idx <- which(all_affils == val)
+        aff_for_author <- c(aff_for_author, idx)
+      }
+    }
+    aff_superscript <- ""
+    if (length(aff_for_author) > 0) {
+      aff_superscript <- paste0("^", paste(aff_for_author, collapse = ","), "^")
+    }
+    
+    # Co-first footnote marker (†)
+    # if rank == co_first_rank
+    co_first_marker_superscript  <- ""
+    if (co_first_flag && !is.na(row["Rank"]) && row["Rank"] == co_first_rank) {
+      co_first_marker <- "\u2020"  # †
+      co_first_marker_superscript <- paste0("^", co_first_marker, "^")
+      # Add to the superscript if it exists
+    }
+    
+    
+    # Corresponding author marker (*)
+    corr_marker_superscript <- ""
+    if (as.logical(row["IsCorresponding"])) {
+      corr_marker <- "*"
+      corr_marker_superscript <- paste0("^", corr_marker, "^")
+    }
+    
+    # e.g., "Alice M. Smith^1†*"
+    paste0(full_name, aff_superscript, co_first_marker_superscript, corr_marker_superscript)
   })
   
-  # Build affiliation legend
-  affil_lines <- mapply(function(i, aff) {
-    paste0("[", i, "] ", aff)
-  }, affil_indices, all_affils)
+  author_line <- paste(author_strs, collapse = ", ")
   
-  # Add co-first authors note if applicable
-  co_first_note <- ""
-  if (co_first_footnote && "Rank" %in% names(data)) {
-    min_rank <- min(data$Rank, na.rm = TRUE)
-    if(sum(data$Rank == min_rank) > 1) {
-      co_first_note <- "Note: Authors with the same rank contributed equally."
+  # 6) Build the affiliation lines
+  #    e.g.,
+  #    "^1^ University of X, Dept. of Y
+  #     ^2^ Company Z, Research Division"
+  aff_lines <- mapply(function(i, aff) {
+    paste0(i, ". ", aff)
+  }, aff_indices, all_affils)
+  aff_text <- paste(aff_lines, collapse = "\n\n")
+  
+  # 7) Build footnotes if needed
+  footnotes <- c()
+  
+  # co-first note
+  if (co_first_flag) {
+    footnotes <- c(footnotes, "\u2020Co-first authors who contributed equally. \n\n")
+  }
+  
+  # corresponding authors
+  corr_idx <- which(data$IsCorresponding == TRUE)
+  if (length(corr_idx) > 0 && "Email" %in% colnames(data)) {
+    corr_emails <- unique(as.character(data$Email[corr_idx]))
+    corr_emails <- corr_emails[!is.na(corr_emails) & corr_emails != ""]
+    if (length(corr_emails) > 0) {
+      corr_line <- paste("Corresponding author(s):", paste(corr_emails, collapse = ", "))
+      # Mark with '*'
+      footnotes <- c(footnotes, paste0("*", corr_line))
     }
   }
   
-  # Compose the full title page text
-  title_text <- if (!is.null(title)) paste0("Title: ", title, "\n\n") else ""
-  author_text <- paste(author_lines, collapse = "\n")
-  affil_text <- paste(affil_lines, collapse = "\n")
+  footnote_text <- ""
+  if (length(footnotes) > 0) {
+    footnote_text <- paste(footnotes, collapse = "\n")
+  }
   
-  content <- paste0(title_text, author_text, "\n\nAffiliations:\n", affil_text, "\n\n", co_first_note)
-  return(content)
+  # 8) Assemble final output
+  # Something like:
+  # Title: ...
+  #
+  # Alice M. Smith^1†*, Bob Johnson^1,2†
+  #
+  # ^1^ University of X, Dept. of Y
+  # ^2^ Company Z, Research Division
+  #
+  # † indicates co-first authors...
+  # * Corresponding author(s): ...
+  
+  lines <- c()
+  
+  if (!is.null(title) && title != "") {
+    lines <- c(lines, paste0('## ',title, "\n"))
+  }
+  
+  lines <- c(lines, author_line, "")
+  if (length(all_affils) > 0) {
+    lines <- c(lines, aff_text, "")
+  }
+  
+  if (footnote_text != "") {
+    lines <- c(lines, footnote_text)
+  }
+  
+  final_output <- paste(lines, collapse = "\n")
+  return(final_output)
 }

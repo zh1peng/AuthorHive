@@ -17,17 +17,17 @@
 #'   browseURL(html_path)
 #' }
 render_section_html <- function(section_title, content_function, data,
-                                output_file = tempfile(fileext = ".html")) {
+                                output_file = tempfile(fileext = ".html"),...) {
   # Get the section content
-  content <- content_function(data)
+  content <- content_function(data, ...)
   
   # Build an R Markdown document with a section header and content
   rmd_content <- paste0(
     "---\n",
-    "title: \"", section_title, "\"\n",
+    "title: \"", "HTML output", "\"\n",
     "output: html_document\n",
     "---\n\n",
-    "# ", section_title, "\n\n",
+    "### ", section_title, "\n\n",
     content, "\n"
   )
   
