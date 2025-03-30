@@ -1,3 +1,4 @@
 ^authordown\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+packageDescription.R
