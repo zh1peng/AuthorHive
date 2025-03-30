@@ -1,47 +1,49 @@
 #' Generate a Conflict of Interest Statement
 #'
-#' @description Reads each author's Conflict text (if any) and merges them
-#' into a single statement. If all authors say \"No conflict\", returns a
-#' single line: \"All authors declare no conflict of interest.\"
+#' @description Produces a readable conflict statement. If all authors report no conflict,
+#' it states so. Otherwise, it lists the authors reporting conflicts and then indicates that
+#' the remaining authors declare no conflict.
 #'
-#' @param data A data frame containing a column \code{Conflict}.
-#' @return A character string for the conflict of interest statement.
+#' @param data A data frame containing at least the columns: FirstName, LastName, and Conflict.
+#' @return A character string with the formatted conflict statement.
 #' @export
 #' @examples
 #' authors <- data.frame(
 #'   FirstName = c("Alice", "Bob"),
 #'   LastName = c("Smith", "Johnson"),
-#'   Conflict = c("No conflict", "Consultant at Company Z")
+#'   Conflict = c("No conflict", "Consultant at Company Z"),
+#'   stringsAsFactors = FALSE
 #' )
 #' generate_conflict(authors)
 generate_conflict <- function(data) {
-  if (!"Conflict" %in% names(data)) {
-    return("No conflict of interest information found.\n")
+  if (!("Conflict" %in% names(data))) {
+    return("No conflict of interest information provided.")
   }
-
-  conflicts <- stats::na.omit(data$Conflict)
-
-  if (length(conflicts) == 0) {
-    return("No conflict of interest statements provided.\n")
-  }
-
-  # Check if all are "No conflict"
-  all_no_conflict <- all(tolower(conflicts) == "no conflict")
-  if (all_no_conflict) {
-    return("All authors declare no conflict of interest.\n")
-  }
-
-  # Otherwise, list each author’s conflict
-  # optionally include author name
-  # e.g. "Alice Smith: No conflict. Bob Johnson: Consultant at Company Z."
-  lines <- apply(data, 1, function(row) {
-    if (is.na(row[["Conflict"]]) || row[["Conflict"]] == "") {
-      return(NULL)
+  
+  data$Conflict <- trimws(as.character(data$Conflict))
+  
+  conflict_authors <- data[!is.na(data$Conflict) & data$Conflict != "" &
+                              tolower(data$Conflict) != "no conflict", ]
+  non_conflict_authors <- data[is.na(data$Conflict) | data$Conflict == "" |
+                                 tolower(data$Conflict) == "no conflict", ]
+  
+  if (nrow(conflict_authors) == 0) {
+    return("All authors declare no conflict of interest.")
+  } else {
+    conflict_lines <- apply(conflict_authors, 1, function(row) {
+      paste0(row["FirstName"], " ", row["LastName"], " (", row["Conflict"], ")")
+    })
+    conflict_text <- paste(conflict_lines, collapse = "; ")
+    result <- paste0("The following authors report conflicts of interest: ", 
+                     conflict_text, ".")
+    if (nrow(non_conflict_authors) > 0) {
+      non_conflict_names <- apply(non_conflict_authors, 1, function(row) {
+        paste(row["FirstName"], row["LastName"])
+      })
+      result <- paste0(result, " All other authors (", 
+                       paste(non_conflict_names, collapse = ", "), 
+                       ") declare no conflict of interest.")
     }
-    paste0(row[["FirstName"]], " ", row[["LastName"]], ": ", row[["Conflict"]])
-  })
-  lines <- lines[!sapply(lines, is.null)]
-
-  final_text <- paste(lines, collapse = ". ")
-  paste0("Conflict of Interest: ", final_text, ".")
+    return(result)
+  }
 }

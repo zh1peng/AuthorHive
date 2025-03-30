@@ -1,44 +1,32 @@
-#' Generate Author Contributions (CRediT)
+#' Generate Author Contributions
 #'
-#' @description Merges each author's contribution statement into a single block.
-#' Optionally includes the author's name in front for clarity.
+#' @description Combines each author's contribution statement into a clear paragraph.
+#' Each line indicates the author and their specific contribution.
 #'
-#' @param data A data frame containing a column \code{Contribution}.
-#' @param list_style If TRUE, each author’s contribution is on a new line.
-#' @return A character string summarizing contributions.
+#' @param data A data frame containing at least the columns: FirstName, LastName, and Contribution.
+#' @return A character string summarizing the author contributions.
 #' @export
 #' @examples
 #' authors <- data.frame(
 #'   FirstName = c("Alice", "Bob"),
 #'   LastName = c("Smith", "Johnson"),
-#'   Contribution = c("Conceptualization; Data curation", "Supervision; Writing - review")
+#'   Contribution = c("Conceptualization; Data curation", "Supervision; Writing - review"),
+#'   stringsAsFactors = FALSE
 #' )
 #' generate_contribution(authors)
-generate_contribution <- function(data, list_style = TRUE) {
-  if (!"Contribution" %in% names(data)) {
-    return("No contribution information found.\n")
+generate_contribution <- function(data) {
+  if (!("Contribution" %in% names(data))) {
+    return("No author contributions provided.")
   }
-
-  non_empty <- data[!is.na(data$Contribution) & data$Contribution != "", ]
-  if (nrow(non_empty) == 0) {
-    return("No contributions provided.\n")
+  
+  valid <- data[!is.na(data$Contribution) & data$Contribution != "", ]
+  if (nrow(valid) == 0) {
+    return("No author contributions provided.")
   }
-
-  lines <- apply(non_empty, 1, function(row) {
-    author_name <- paste(row[["FirstName"]], row[["LastName"]])
-    contrib <- row[["Contribution"]]
-    paste0(author_name, ": ", contrib)
+  
+  lines <- apply(valid, 1, function(row) {
+    paste0(row["FirstName"], " ", row["LastName"], " contributed as follows: ", row["Contribution"])
   })
-
-  if (list_style) {
-    # each author on a new line
-    final_text <- paste(lines, collapse = "\n")
-    final_text <- paste("Author Contributions:\n", final_text)
-  } else {
-    # single paragraph
-    final_text <- paste(lines, collapse = ". ")
-    final_text <- paste("Author Contributions:", final_text)
-  }
-
-  return(final_text)
+  result <- paste(lines, collapse = "\n")
+  return(result)
 }

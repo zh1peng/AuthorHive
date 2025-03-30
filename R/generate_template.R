@@ -28,7 +28,7 @@ generate_template <- function(file = "authordown_template.csv", excel = FALSE) {
       "Writing - Review & Editing"
     ),
     Affiliation1 = c("University of X, Dept. of Y", "University of X, Dept. of Y"),
-    Affiliation2 = c(NA, "Company Z, Research Division")
+    Affiliation2 = c('', "Company Z, Research Division")
   )
 
   if (!excel) {

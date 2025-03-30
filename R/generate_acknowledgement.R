@@ -1,45 +1,32 @@
 #' Generate an Acknowledgement Section
 #'
-#' @description Reads each author's Acknowledgement text (if any) and merges
-#' them into a single paragraph or bullet list.
+#' @description Combines acknowledgements from each author into a formatted paragraph.
+#' Each line indicates the author and their acknowledgement.
 #'
-#' @param data A data frame containing a column \code{Acknowledgement}.
-#' @param style A character string to control the format (\"paragraph\" or \"bullets\").
-#' @return A character string representing the combined acknowledgements.
+#' @param data A data frame containing at least the columns: FirstName, LastName, and Acknowledgement.
+#' @return A character string with the formatted acknowledgements.
 #' @export
 #' @examples
 #' authors <- data.frame(
 #'   FirstName = c("Alice", "Bob"),
-#'   Acknowledgement = c("Thanks to funder A", "")
+#'   LastName = c("Smith", "Johnson"),
+#'   Acknowledgement = c("Thanks for funding A", "Supported by XYZ"),
+#'   stringsAsFactors = FALSE
 #' )
 #' generate_acknowledgement(authors)
-generate_acknowledgement <- function(data, style = c("paragraph", "bullets")) {
-  style <- match.arg(style)
-  if (!"Acknowledgement" %in% names(data)) {
-    return("No acknowledgement column found.\n")
+generate_acknowledgement <- function(data) {
+  if (!("Acknowledgement" %in% names(data))) {
+    return("No acknowledgement information provided.")
   }
-
-  # Filter out empty acknowledgements
-  non_empty <- data[!is.na(data$Acknowledgement) & data$Acknowledgement != "", ]
-  if (nrow(non_empty) == 0) {
-    return("No acknowledgements provided.\n")
+  
+  valid <- data[!is.na(data$Acknowledgement) & data$Acknowledgement != "", ]
+  if (nrow(valid) == 0) {
+    return("No acknowledgements provided.")
   }
-
-  # Build lines
-  lines <- apply(non_empty, 1, function(row) {
-    # optional: you could include the author name if you want
-    # paste0(row[["FirstName"]], " ", row[["LastName"]], ": ", row[["Acknowledgement"]])
-    row[["Acknowledgement"]]
+  
+  lines <- apply(valid, 1, function(row) {
+    paste0(row["FirstName"], " ", row["LastName"], " acknowledges: ", row["Acknowledgement"])
   })
-
-  if (style == "paragraph") {
-    ack_text <- paste(lines, collapse = " ")
-    ack_text <- paste("Acknowledgements:", ack_text)
-  } else {
-    # bullet style
-    bullet_lines <- paste("- ", lines, collapse = "\n")
-    ack_text <- paste("Acknowledgements:\n", bullet_lines)
-  }
-
-  return(ack_text)
+  result <- paste(lines, collapse = "\n")
+  return(result)
 }

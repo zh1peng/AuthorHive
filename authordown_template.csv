@@ -1,0 +1,3 @@
+"FirstName","MiddleName","LastName","Degree","Email","Rank","Correspondence","Acknowledgement","Conflict","Contribution","Affiliation1","Affiliation2"
+"Alice","M.","Smith","PhD","alice@example.com",1,TRUE,"Thanks to funder A","No conflict","Conceptualization; Writing - Original Draft","University of X, Dept. of Y",NA
+"Bob","","Johnson","MD","bob@example.com",2,FALSE,"","Consultant at Company Z","Writing - Review & Editing","University of X, Dept. of Y","Company Z, Research Division"
