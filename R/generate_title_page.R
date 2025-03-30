@@ -111,23 +111,21 @@ generate_title_page <- function(data, title = NULL, co_first_footnote = TRUE) {
     
     # Co-first footnote marker (†)
     # if rank == co_first_rank
-    co_first_marker_superscript  <- ""
+    co_first_marker  <- ""
     if (co_first_flag && !is.na(row["Rank"]) && row["Rank"] == co_first_rank) {
       co_first_marker <- "\u2020"  # †
-      co_first_marker_superscript <- paste0("^", co_first_marker, "^")
       # Add to the superscript if it exists
     }
     
     
     # Corresponding author marker (*)
-    corr_marker_superscript <- ""
+    corr_marker <- ""
     if (as.logical(row["IsCorresponding"])) {
       corr_marker <- "*"
-      corr_marker_superscript <- paste0("^", corr_marker, "^")
     }
     
     # e.g., "Alice M. Smith^1†*"
-    paste0(full_name, aff_superscript, co_first_marker_superscript, corr_marker_superscript)
+    paste0(full_name, aff_superscript, co_first_marker, corr_marker)
   })
   
   author_line <- paste(author_strs, collapse = ", ")
