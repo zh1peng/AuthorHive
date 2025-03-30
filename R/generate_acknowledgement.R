@@ -1,6 +1,6 @@
 #' Generate an Acknowledgement Section
 #'
-#' @description Reads each author's Acknowledgement text (if any) and merges 
+#' @description Reads each author's Acknowledgement text (if any) and merges
 #' them into a single paragraph or bullet list.
 #'
 #' @param data A data frame containing a column \code{Acknowledgement}.
@@ -18,20 +18,20 @@ generate_acknowledgement <- function(data, style = c("paragraph", "bullets")) {
   if (!"Acknowledgement" %in% names(data)) {
     return("No acknowledgement column found.\n")
   }
-  
+
   # Filter out empty acknowledgements
   non_empty <- data[!is.na(data$Acknowledgement) & data$Acknowledgement != "", ]
   if (nrow(non_empty) == 0) {
     return("No acknowledgements provided.\n")
   }
-  
+
   # Build lines
-  lines <- apply(non_empty, 1, function(row){
+  lines <- apply(non_empty, 1, function(row) {
     # optional: you could include the author name if you want
     # paste0(row[["FirstName"]], " ", row[["LastName"]], ": ", row[["Acknowledgement"]])
     row[["Acknowledgement"]]
   })
-  
+
   if (style == "paragraph") {
     ack_text <- paste(lines, collapse = " ")
     ack_text <- paste("Acknowledgements:", ack_text)
@@ -40,6 +40,6 @@ generate_acknowledgement <- function(data, style = c("paragraph", "bullets")) {
     bullet_lines <- paste("- ", lines, collapse = "\n")
     ack_text <- paste("Acknowledgements:\n", bullet_lines)
   }
-  
+
   return(ack_text)
 }

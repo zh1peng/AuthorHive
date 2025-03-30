@@ -21,4 +21,4 @@ usethis::use_agpl3_license()
 
 usethis::use_package("shiny")
 
-testthat::
+

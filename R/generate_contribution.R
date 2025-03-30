@@ -18,18 +18,18 @@ generate_contribution <- function(data, list_style = TRUE) {
   if (!"Contribution" %in% names(data)) {
     return("No contribution information found.\n")
   }
-  
+
   non_empty <- data[!is.na(data$Contribution) & data$Contribution != "", ]
   if (nrow(non_empty) == 0) {
     return("No contributions provided.\n")
   }
-  
-  lines <- apply(non_empty, 1, function(row){
+
+  lines <- apply(non_empty, 1, function(row) {
     author_name <- paste(row[["FirstName"]], row[["LastName"]])
     contrib <- row[["Contribution"]]
     paste0(author_name, ": ", contrib)
   })
-  
+
   if (list_style) {
     # each author on a new line
     final_text <- paste(lines, collapse = "\n")
@@ -39,6 +39,6 @@ generate_contribution <- function(data, list_style = TRUE) {
     final_text <- paste(lines, collapse = ". ")
     final_text <- paste("Author Contributions:", final_text)
   }
-  
+
   return(final_text)
 }

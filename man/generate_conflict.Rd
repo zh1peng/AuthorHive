@@ -20,6 +20,7 @@ single line: \"All authors declare no conflict of interest.\"
 \examples{
 authors <- data.frame(
   FirstName = c("Alice", "Bob"),
+  LastName = c("Smith", "Johnson"),
   Conflict = c("No conflict", "Consultant at Company Z")
 )
 generate_conflict(authors)

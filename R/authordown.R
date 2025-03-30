@@ -16,7 +16,6 @@
 #' cat(authordown(authors, title = "My Great Paper", style = "default"))
 #' }
 authordown <- function(data, title = NULL, style = "default") {
-  
   # 1) Title page
   tp <- generate_title_page(
     data = data,
@@ -24,16 +23,16 @@ authordown <- function(data, title = NULL, style = "default") {
     title = title,
     co_first_footnote = TRUE
   )
-  
+
   # 2) Acknowledgements
   ack <- generate_acknowledgement(data, style = "paragraph")
-  
+
   # 3) Conflict of interest
   coi <- generate_conflict(data)
-  
+
   # 4) Contributions
   contrib <- generate_contribution(data, list_style = TRUE)
-  
+
   # Combine all
   final_text <- paste(
     tp,
@@ -42,6 +41,6 @@ authordown <- function(data, title = NULL, style = "default") {
     "\n\n", contrib,
     sep = ""
   )
-  
+
   return(final_text)
 }
